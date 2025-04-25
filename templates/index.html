@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CSV Data Display</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item h2 {
+            margin: 0;
+            color: #333;
+        }
+        .item p {
+            margin: 5px 0;
+            color: #666;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            margin: 0 10px;
+        }
+        .favorite-icon {
+            color: #ddd;
+            cursor: pointer;
+        }
+        .favorite-icon.favorited {
+            color: gold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Reading</h1>
+        {% for row, favorite in data %}
+        <div class="item">
+            <h2>{{ row.Title }}</h2>
+            <p><strong>Main URL:</strong> <a href="{{ row['Main URL'] }}">论文链接</a></p>
+            <p><strong>Journal:</strong> {{ row.Journal }}</p>
+            <p><strong>Date:</strong> {{ row.Date }}</p>
+            <p><strong>Abstract:</strong> {{ row.Abstract }}</p>
+            <i class="favorite-icon" onclick="toggleFavorite(this, '{{ row.Title }}')" data-title="{{ row.Title }}">{% if favorite %}★{% else %}☆{% endif %}</i>
+        </div>
+        {% endfor %}
+        <div class="pagination">
+            {% if prev_page %}
+            <a href="{{ prev_page }}" id="prev-page">Previous</a>
+            {% endif %}
+            {% if next_page %}
+            <a href="{{ next_page }}" id="next-page">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        function toggleFavorite(icon, title) {
+            fetch('/favorite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `item_id=${title}`
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      icon.classList.toggle('favorited');
+                  }
+              });
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                document.getElementById('prev-page').click();
+            } else if (event.key === 'ArrowRight') {
+                document.getElementById('next-page').click();
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();  // 阻止默认行为
+                const favoriteIcon = document.querySelector('.favorite-icon:not(.favorited)');
+                if (favoriteIcon) {
+                    toggleFavorite(favoriteIcon, favoriteIcon.dataset.title);
+                }
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();  // 阻止默认行为
+                const favoriteIcon = document.querySelector('.favorite-icon.favorited');
+                if (favoriteIcon) {
+                    toggleFavorite(favoriteIcon, favoriteIcon.dataset.title);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

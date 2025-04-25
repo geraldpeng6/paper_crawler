@@ -8,7 +8,7 @@ import pandas as pd
 from datetime import datetime
 
 # 设置Chrome驱动路径和代理
-chrome_driver_path = 'chromedriver.exe'
+chrome_driver_path = 'chromedriver'
 
 # 代理设置，需要自己设置端口
 chrome_options = Options()
@@ -19,7 +19,7 @@ service = Service(executable_path=chrome_driver_path)
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # 打开目标网址
-base_url = 'http://typeset.io/'
+base_url = 'http://typeset.io'
 driver.get(base_url)
 input("准备好了请输入启动：")
 
